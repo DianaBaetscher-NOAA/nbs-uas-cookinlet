@@ -1,0 +1,33 @@
+---
+title: "README"
+author: "Diana Baetscher"
+date: "2022-10-06"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Cook Inlet eDNA study
+
+This is a collaboration with Yumi Arimitsu (USGS) to look at eDNA as a complementary data source to midwater trawl nets and acoustic data. The ecological questions pertain to forage fish distribution and abundance related to seabird productivity. There are some interesting oceanographic features in the study area that can be explored (upwelling, stratification, etc.).
+
+
+## Data
+
+Data from 2021 and 2022 include:
+
+1. eDNA samples collected from water (filtered at sea)
+Filters stored in Longmire buffer, extracted, and metabarcoded using MiFish 
+
+
+2. trawl data
+Some stations have acoustic data, but no trawl data due to challenges with the trawl net, weather, etc.
+
+
+3. acoustic data
+These are not currently associated with this repository, but may be added for future analyses.
+
+
+

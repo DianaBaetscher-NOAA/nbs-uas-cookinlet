@@ -1,0 +1,84 @@
+station_number,Year,region,fishing_method,Lat,Lon,trawl_ave_net_depth_m,trawl_distance_towed_m,common_name,SumOfcount,genus_name,species_name
+202117601,2021,Prince William Sound,modified herring trawl,60.19216,-148.18385,,,Arrowtooth flounder,2,Atheresthes,stomias
+202117601,2021,Prince William Sound,modified herring trawl,60.19216,-148.18385,,,Big skate,1,Beringraja,binoculata
+202117601,2021,Prince William Sound,modified herring trawl,60.19216,-148.18385,,,Eulachon,3,Thaleichthys,pacificus
+202117601,2021,Prince William Sound,modified herring trawl,60.19216,-148.18385,,,Flathead sole,21,Hippoglossoides,elassodon
+202117601,2021,Prince William Sound,modified herring trawl,60.19216,-148.18385,,,Great sculpin,1,Myoxocephalus,polyacanthocephalus
+202117601,2021,Prince William Sound,modified herring trawl,60.19216,-148.18385,,,Rex sole,1,Glyptocephalus,zachirus
+202117601,2021,Prince William Sound,modified herring trawl,60.19216,-148.18385,,,Roughspine sculpin,1,Triglops,macellus
+202117601,2021,Prince William Sound,modified herring trawl,60.19216,-148.18385,,,Slim sculpin,4,Radulinus,asprellus
+202117601,2021,Prince William Sound,modified herring trawl,60.19216,-148.18385,,,Spineyhead sculpin,1,Dasycottus,setiger
+202117601,2021,Prince William Sound,modified herring trawl,60.19216,-148.18385,,,Sturgeon poacher,1,Podothecus,accipenserinus
+202117601,2021,Prince William Sound,modified herring trawl,60.19216,-148.18385,,,Thorny sculpin,5,Icelus,spiniger
+202117601,2021,Prince William Sound,modified herring trawl,60.19216,-148.18385,,,Walleye pollock,8,Gadus,chalcogrammus
+202117601,2021,Prince William Sound,modified herring trawl,60.19216,-148.18385,,,Wattled eelpout,4,Lycodes,palearis
+202117601,2021,Prince William Sound,modified herring trawl,60.19216,-148.18385,,,Whitebarred prickleback,5,Poroclinus,rothrocki
+2021105001,2021,Cook Inlet,modified herring trawl,60.02233,-152.54083,14.82,1.025313467,Pacific sand lance,200,Ammodytes,personatus
+2021105001,2021,Cook Inlet,modified herring trawl,60.02233,-152.54083,14.82,1.025313467,Pink salmon (humpback),7,Oncorhynchus,gorbuscha
+2021105001,2021,Cook Inlet,modified herring trawl,60.02233,-152.54083,14.82,1.025313467,Snake prickleback,1,Lumpenus,sagitta
+2021122001,2021,Cook Inlet,modified herring trawl,60.16977,-152.30313,35.21,3.782351659,Capelin,2,Mallotus,catervarius
+2021122001,2021,Cook Inlet,modified herring trawl,60.16977,-152.30313,35.21,3.782351659,Crangon shrimp,9,,
+2021122001,2021,Cook Inlet,modified herring trawl,60.16977,-152.30313,35.21,3.782351659,Euphausiid UNID,,Euphausiacea (order),
+2021122001,2021,Cook Inlet,modified herring trawl,60.16977,-152.30313,35.21,3.782351659,Longfin smelt,103,Spirinchus,thaleichthys
+2021122001,2021,Cook Inlet,modified herring trawl,60.16977,-152.30313,35.21,3.782351659,Mysid,,,
+2021122001,2021,Cook Inlet,modified herring trawl,60.16977,-152.30313,35.21,3.782351659,Pacific sandfish,9,Trichodon,trichodon
+2021122001,2021,Cook Inlet,modified herring trawl,60.16977,-152.30313,35.21,3.782351659,Pink shrimp,61,,
+2021122001,2021,Cook Inlet,modified herring trawl,60.16977,-152.30313,35.21,3.782351659,Walleye pollock,5,Gadus,chalcogrammus
+2021123001,2021,Cook Inlet,modified herring trawl,60.07589,-152.05537,41.24,1.48371356,Pacific cod,1,Gadus,macrocephalus
+2021123001,2021,Cook Inlet,modified herring trawl,60.07589,-152.05537,41.24,1.48371356,Pacific sand lance,19,Ammodytes,personatus
+2021123001,2021,Cook Inlet,modified herring trawl,60.07589,-152.05537,41.24,1.48371356,Pacific tomcod,3,Microgadus,proximus
+2021123001,2021,Cook Inlet,modified herring trawl,60.07589,-152.05537,41.24,1.48371356,Walleye pollock,72,Gadus,chalcogrammus
+2021124001,2021,Cook Inlet,modified herring trawl,60.01097,-152.25006,10.95,1.557963733,Pacific sand lance,1,Ammodytes,personatus
+2021124001,2021,Cook Inlet,modified herring trawl,60.01097,-152.25006,10.95,1.557963733,Pink salmon (humpback),35,Oncorhynchus,gorbuscha
+2021125001,2021,Cook Inlet,modified herring trawl,59.91404,-151.95882,31,1.547940094,Flathead sole,4,Hippoglossoides,elassodon
+2021125001,2021,Cook Inlet,modified herring trawl,59.91404,-151.95882,31,1.547940094,Pacific sand lance,756,Ammodytes,personatus
+2021125001,2021,Cook Inlet,modified herring trawl,59.91404,-151.95882,31,1.547940094,Poacher UNID,4,Agonidae (family),
+2021125001,2021,Cook Inlet,modified herring trawl,59.91404,-151.95882,31,1.547940094,Walleye pollock,8,Gadus,chalcogrammus
+2021126001,2021,Cook Inlet,modified herring trawl,59.84688,-152.55803,28.94,0.606121121,Capelin,6,Mallotus,catervarius
+2021126001,2021,Cook Inlet,modified herring trawl,59.84688,-152.55803,28.94,0.606121121,Chum salmon,3,Oncorhynchus,keta
+2021126001,2021,Cook Inlet,modified herring trawl,59.84688,-152.55803,28.94,0.606121121,Crangon shrimp,23,,
+2021126001,2021,Cook Inlet,modified herring trawl,59.84688,-152.55803,28.94,0.606121121,Eulachon,1,Thaleichthys,pacificus
+2021126001,2021,Cook Inlet,modified herring trawl,59.84688,-152.55803,28.94,0.606121121,Liparis sp.,43,Liparis ,sp.
+2021126001,2021,Cook Inlet,modified herring trawl,59.84688,-152.55803,28.94,0.606121121,Longfin smelt,1,Spirinchus,thaleichthys
+2021126001,2021,Cook Inlet,modified herring trawl,59.84688,-152.55803,28.94,0.606121121,Pacific sand lance,37,Ammodytes,personatus
+2021126001,2021,Cook Inlet,modified herring trawl,59.84688,-152.55803,28.94,0.606121121,Pacific sandfish,2,Trichodon,trichodon
+2021126001,2021,Cook Inlet,modified herring trawl,59.84688,-152.55803,28.94,0.606121121,Pacific tomcod,1,Microgadus,proximus
+2021126001,2021,Cook Inlet,modified herring trawl,59.84688,-152.55803,28.94,0.606121121,Pink salmon (humpback),39,Oncorhynchus,gorbuscha
+2021126001,2021,Cook Inlet,modified herring trawl,59.84688,-152.55803,28.94,0.606121121,Pink shrimp,120,,
+2021126001,2021,Cook Inlet,modified herring trawl,59.84688,-152.55803,28.94,0.606121121,Variegated snailfish,1,Liparis,gibbus
+2021205001,2021,Cook Inlet,modified herring trawl,59.71523,-151.11488,16.32,1.113860091,Flathead sole,2,Hippoglossoides,elassodon
+2021205001,2021,Cook Inlet,modified herring trawl,59.71523,-151.11488,16.32,1.113860091,Pacific herring,2,Clupea,pallasii
+2021205001,2021,Cook Inlet,modified herring trawl,59.71523,-151.11488,16.32,1.113860091,Pacific tomcod,3,Microgadus,proximus
+2021205001,2021,Cook Inlet,modified herring trawl,59.71523,-151.11488,16.32,1.113860091,Pink salmon (humpback),1,Oncorhynchus,gorbuscha
+2021205001,2021,Cook Inlet,modified herring trawl,59.71523,-151.11488,16.32,1.113860091,Quillfish,1,Ptilichthys,goodei
+2021205001,2021,Cook Inlet,modified herring trawl,59.71523,-151.11488,16.32,1.113860091,Walleye pollock,2,Gadus,chalcogrammus
+2021205002,2021,Cook Inlet,modified herring trawl,59.73114,-151.08519,23.27,1.239276507,Chum salmon,2,Oncorhynchus,keta
+2021205002,2021,Cook Inlet,modified herring trawl,59.73114,-151.08519,23.27,1.239276507,Pacific herring,6,Clupea,pallasii
+2021210001,2021,Cook Inlet,modified herring trawl,59.50634,-151.60527,87.78,1.786384461,Capelin,11,Mallotus,catervarius
+2021210001,2021,Cook Inlet,modified herring trawl,59.50634,-151.60527,87.78,1.786384461,Euphausiid UNID,,Euphausiacea (order),
+2021210001,2021,Cook Inlet,modified herring trawl,59.50634,-151.60527,87.78,1.786384461,Pacific herring,2,Clupea,pallasii
+2021210001,2021,Cook Inlet,modified herring trawl,59.50634,-151.60527,87.78,1.786384461,Pacific sandfish,1,Trichodon,trichodon
+2021210001,2021,Cook Inlet,modified herring trawl,59.50634,-151.60527,87.78,1.786384461,Pacific tomcod,1,Microgadus,proximus
+2021210001,2021,Cook Inlet,modified herring trawl,59.50634,-151.60527,87.78,1.786384461,Walleye pollock,11,Gadus,chalcogrammus
+2021223001,2021,Cook Inlet,modified herring trawl,59.58292,-151.58394,27.07,1.445204512,Capelin,1,Mallotus,catervarius
+2021223001,2021,Cook Inlet,modified herring trawl,59.58292,-151.58394,27.07,1.445204512,Crab UNID,,,
+2021223001,2021,Cook Inlet,modified herring trawl,59.58292,-151.58394,27.07,1.445204512,Pacific tomcod,3,Microgadus,proximus
+2021223001,2021,Cook Inlet,modified herring trawl,59.58292,-151.58394,27.07,1.445204512,Stubby squid,1,Rossia,Pacifica
+2021223002,2021,Cook Inlet,modified herring trawl,59.56679,-151.41391,76.14,1.681203434,Capelin,1,Mallotus,catervarius
+2021223002,2021,Cook Inlet,modified herring trawl,59.56679,-151.41391,76.14,1.681203434,Daubed shanny,4,Leptoclinus,maculatus
+2021223002,2021,Cook Inlet,modified herring trawl,59.56679,-151.41391,76.14,1.681203434,Euphausiid UNID,,Euphausiacea (order),
+2021223002,2021,Cook Inlet,modified herring trawl,59.56679,-151.41391,76.14,1.681203434,Pacific tomcod,4,Microgadus,proximus
+2021223002,2021,Cook Inlet,modified herring trawl,59.56679,-151.41391,76.14,1.681203434,Squid UNID,2,Squid UNID,
+2021223002,2021,Cook Inlet,modified herring trawl,59.56679,-151.41391,76.14,1.681203434,Walleye pollock,3,Gadus,chalcogrammus
+2021224001,2021,Cook Inlet,modified herring trawl,59.51096,-152.15073,8.44,1.918949103,Decorated warbonnet,2,Chirolophis,decoratus
+2021224001,2021,Cook Inlet,modified herring trawl,59.51096,-152.15073,8.44,1.918949103,Flatfish UNID,1,Pleuronectidae,
+2021224001,2021,Cook Inlet,modified herring trawl,59.51096,-152.15073,8.44,1.918949103,Flathead sole,1,Hippoglossoides,elassodon
+2021224001,2021,Cook Inlet,modified herring trawl,59.51096,-152.15073,8.44,1.918949103,Pacific herring,2,Clupea,pallasii
+2021224001,2021,Cook Inlet,modified herring trawl,59.51096,-152.15073,8.44,1.918949103,Pacific sand lance,33,Ammodytes,personatus
+2021224001,2021,Cook Inlet,modified herring trawl,59.51096,-152.15073,8.44,1.918949103,Pacific sandfish,3,Trichodon,trichodon
+2021224001,2021,Cook Inlet,modified herring trawl,59.51096,-152.15073,8.44,1.918949103,Prowfish,1,Zaprora,silenus
+2021224002,2021,Cook Inlet,modified herring trawl,59.49363,-151.13885,27.96,1.3258614,Pacific tomcod,2,Microgadus,proximus
+2021224002,2021,Cook Inlet,modified herring trawl,59.49363,-151.13885,27.96,1.3258614,Prowfish,1,Zaprora,silenus
+2021224002,2021,Cook Inlet,modified herring trawl,59.49363,-151.13885,27.96,1.3258614,Quillfish,1,Ptilichthys,goodei
+2021224002,2021,Cook Inlet,modified herring trawl,59.49363,-151.13885,27.96,1.3258614,Spineyhead sculpin,1,Dasycottus,setiger
+2021224002,2021,Cook Inlet,modified herring trawl,59.49363,-151.13885,27.96,1.3258614,Walleye pollock,3,Gadus,chalcogrammus

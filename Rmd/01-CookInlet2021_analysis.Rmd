@@ -1,0 +1,755 @@
+---
+title: "Cook Inlet 2021 analysis"
+output: html_notebook
+---
+
+31 May 2022
+
+Dataframe ported from the VM for offline analysis...
+
+
+```{r}
+library(tidyverse)
+
+```
+
+
+```{r}
+cook.df <- read_csv("../data/CookInlet2021_dataframe.csv") %>%
+    mutate(`Sample Code` = ifelse(is.na(`Sample Code`), "pcr_negative", `Sample Code`))
+
+
+cook.df
+```
+
+Take a quick look at controls, again.
+
+```{r}
+cook.df %>%
+  filter(`Sample Code` %in% c("extraction_blank", "field_negative", "pcr_negative") |
+           str_detect(Sample_ID, "NEGATIVE")) %>%
+  filter(pcr_rep != 3) %>%
+  ggplot(aes(x = Sample_ID, y = total_taxon_ct, fill = taxon)) +
+  geom_bar(stat = "identity") +
+  facet_grid(cols = vars(`Sample Code`), scales = "free") +
+  theme_bw() +
+  theme(
+    axis.text.x = element_text(angle = 90)
+  )
+
+
+```
+
+The variation across negatives and pcr replicates is helpful because it suggests that, for example, the Ammodytidae in e00229_2 is introduced in the PCR rather than in the extraction or field sampling because it only shows up in one pcr replicate.
+
+remove the obvious contaminants...
+
+```{r}
+cook.df %>%
+  filter(`Sample Code` %in% c("extraction_blank", "field_negative", "pcr_negative") |
+           str_detect(Sample_ID, "NEGATIVE")) %>%
+  filter(pcr_rep != 3) %>%
+  filter(!taxon %in% c("Homo_sapiens", "Micropterus")) %>%
+  ggplot(aes(x = Sample_ID, y = total_taxon_ct, fill = taxon)) +
+  geom_bar(stat = "identity") +
+  facet_grid(cols = vars(`Sample Code`), scales = "free") +
+  theme_bw() +
+  theme(
+    axis.text.x = element_text(angle = 90)
+  ) +
+  labs(x = "sample replicate",
+       y = "Sequencing reads",
+       title = "Cook Inlet 2021 blanks")
+
+#ggsave("pdf_outputs/blanks.pdf")
+```
+
+What remains in the extraction blanks and PCR negatives?
+
+```{r}
+cook.df %>%
+  filter(`Sample Code` %in% c("extraction_blank", "pcr_negative") |
+           str_detect(Sample_ID, "NEGATIVE")) %>%
+  filter(pcr_rep != 3) %>%
+  filter(!taxon %in% c("Homo_sapiens", "Micropterus")) %>%
+  ggplot(aes(x = Sample_ID, y = total_taxon_ct, fill = taxon)) +
+  geom_bar(stat = "identity") +
+  facet_grid(cols = vars(`Sample Code`), scales = "free") +
+  theme_bw() +
+  theme(
+    axis.text.x = element_text(angle = 90)
+  ) +
+  labs(x = "sample replicate",
+       y = "Sequencing reads",
+       title = "Cook Inlet 2021 blanks")
+
+```
+Those are the species I would expect to see because they're generally found in samples and negative controls for our metabarcoding studies - potentially introduced from lab contamination (esp. prior to purging barcodes/reagents that had been used for other projects).
+
+
+```{r}
+contam.taxa.to.subtract <- cook.df %>%
+  filter(`Sample Code` %in% c("extraction_blank", "pcr_negative") |
+           str_detect(Sample_ID, "NEGATIVE")) %>%
+  filter(pcr_rep != 3) %>%
+  filter(!taxon %in% c("Homo_sapiens", "Micropterus")) %>%
+  # maximum number of reads per taxon?
+  group_by(taxon) %>%
+  summarise(max(total_taxon_ct)) %>%
+  rename(reads = `max(total_taxon_ct)`)
+
+```
+
+One way to look at this is the number of reads per each of these taxa. Another way would be the relative proportion of each taxon out of the total reads per sample.
+
+Once we begin digging into the samples, we can get a better handle on which approach is more appropriate.
+
+
+
+### Samples
+
+```{r}
+# cook.df %>%
+#   filter(!`Sample Code` %in% c("extraction_blank", "pcr_negative", "field_negative") &
+#            !str_detect(Sample_ID, "NEGATIVE") & 
+#            !str_detect(Sample_ID, "POSITIVE")) %>%
+#   filter(pcr_rep != 3,
+#          total_taxon_ct > 12) %>% # minimum read depth filter based on negative controls
+#   filter(!taxon %in% c("Homo_sapiens", "Micropterus", "Ictalurus", "Sus", "Sus_scrofa", "Bos", "Hominidae")) %>%
+#   ggplot(aes(x = Sample_ID, y = total_taxon_ct, fill = taxon)) +
+#   geom_bar(stat = "identity") +
+#   facet_wrap(~`Sample Code`) +
+#   theme_bw() +
+#   theme(
+#     axis.text.x = element_text(angle = 90),
+#     legend.position = "bottom"
+#   ) +
+#   labs(x = "sample replicate",
+#        y = "Sequencing reads",
+#        title = "Cook Inlet 2021 samples")
+#   
+  
+```
+
+Hard to visualize all of these without drilling down further...
+
+```{r}
+cook.df %>%
+  filter(!`Sample Code` %in% c("extraction_blank", "pcr_negative", "field_negative") &
+           !str_detect(Sample_ID, "NEGATIVE") & 
+           !str_detect(Sample_ID, "POSITIVE")) %>%
+  filter(pcr_rep != 3,
+         total_taxon_ct > 103) %>% # minimum read depth filter based on negative controls
+  filter(!taxon %in% c("Homo_sapiens", "Micropterus", "Ictalurus", "Sus", "Sus_scrofa", "Bos", "Hominidae")) %>%
+  filter(`Sample Code` == "Columbia Bay") %>%
+  ggplot(aes(x = Sample_ID, y = total_taxon_ct, fill = taxon)) +
+  geom_bar(stat = "identity") +
+  facet_wrap(~`Sample Code`) +
+  theme_bw() +
+  theme(
+    axis.text.x = element_text(angle = 90),
+    legend.position = "bottom"
+  ) +
+  labs(x = "sample replicate",
+       y = "Sequencing reads",
+       title = "Cook Inlet 2021 samples")
+  
+
+```
+Here's another question: When one sample replicate has a species that the other rep doesn't, should we assume that it's contamination? (looking at e00239_1 and _2)
+
+Make a list of Sample Codes that I can lapply over:
+
+```{r}
+code.list <- unique(cook.df$`Sample Code`)
+```
+
+
+```{r}
+plot_taxa <- function(sample.code){
+  cook.df %>%
+  # filter(!`Sample Code` %in% c("extraction_blank", "pcr_negative", "field_negative") &
+  #          !str_detect(Sample_ID, "NEGATIVE") & 
+  #          !str_detect(Sample_ID, "POSITIVE")) %>%
+  filter(pcr_rep != 3) %>%
+         # total_taxon_ct > 103) %>% # minimum read depth filter based on negative controls
+  filter(!taxon %in% c("Homo_sapiens", "Micropterus", "Ictalurus", "Sus", "Sus_scrofa", "Bos", "Hominidae") &
+           !str_detect(taxon, "Micropterus")) %>%
+  filter(`Sample Code` == sample.code) %>%
+  ggplot(aes(x = Sample_ID, y = total_taxon_ct, fill = taxon)) +
+  geom_bar(stat = "identity") +
+  facet_wrap(~`Sample Code`) +
+  theme_bw() +
+  theme(
+    axis.text.x = element_text(angle = 90),
+    legend.position = "bottom"
+  ) +
+  labs(x = "sample replicate",
+       y = "Sequencing reads")
+  
+  
+}
+
+```
+
+```{r}
+lapply(code.list, plot_taxa)
+```
+
+
+Now plot the field replicates - 
+```{r}
+plot.field.reps <- function(sample.code){
+  cook.df %>%
+  # filter(!`Sample Code` %in% c("extraction_blank", "pcr_negative", "field_negative") &
+  #          !str_detect(Sample_ID, "NEGATIVE") & 
+  #          !str_detect(Sample_ID, "POSITIVE")) %>%
+  filter(pcr_rep != 3) %>%
+         # total_taxon_ct > 103) %>% # minimum read depth filter based on negative controls
+  filter(!taxon %in% c("Homo_sapiens", "Micropterus", "Ictalurus", "Sus", "Sus_scrofa", "Bos", "Hominidae") &
+           !str_detect(taxon, "Micropterus")) %>%
+  filter(`Sample Code` == sample.code) %>%
+  ggplot(aes(x = field_rep, y = total_taxon_ct, fill = taxon)) +
+  geom_bar(stat = "identity") +
+  facet_wrap(~`Sample Code`) +
+  theme_bw() +
+  theme(
+    axis.text.x = element_text(angle = 90),
+    legend.position = "bottom"
+  ) +
+  labs(x = "sample replicate",
+       y = "Sequencing reads")
+  
+  
+}
+```
+
+
+```{r}
+lapply(code.list, plot.field.reps)
+```
+
+
+Let's look at the species that are contaminants for estimating the proportion of reads to filter:
+```{r}
+prop.df <- cook.df %>%
+  group_by(Sample_ID) %>%
+  mutate(total_reads = sum(total_taxon_ct)) %>%
+  mutate(prop_reads = total_taxon_ct/total_reads)
+
+# these are the species that were certainly introduced in the lab (and not in the field)
+prop.df %>%
+  filter(taxon %in% c("Micropterus", "Ictalurus")|
+           str_detect(taxon, "Micropterus")) %>%
+  arrange(prop_reads) %>%
+  ggplot(aes(x = reorder(Sample_ID, prop_reads), y = prop_reads, fill = taxon)) +
+  geom_bar(stat = "identity") +
+  #facet_wrap(~`Sample Code`) +
+  theme_bw() +
+  theme(
+    axis.text.x = element_text(angle = 90, hjust = 0.95),
+    legend.position = "bottom"
+  ) +
+  labs(x = "sample replicate",
+       y = "Sequencing reads")
+  
+  
+```
+That seems crazy - some samples are nearly 80% lab contamination? Are those samples with below a certain number of reads overall?
+
+Distribution of reads per sample:
+```{r}
+prop.df %>%
+  select(Sample_ID, total_reads) %>%
+  unique() %>%
+  ggplot(aes(x = reorder(Sample_ID, total_reads), y = total_reads)) +
+  geom_bar(stat = "identity") +
+  #facet_wrap(~`Sample Code`) +
+  theme_bw() +
+  theme(
+    axis.text.x = element_text(angle = 90, hjust = 0.95),
+    legend.position = "bottom"
+  ) +
+  labs(x = "sample replicate",
+       y = "Sequencing reads")
+  
+  
+```
+Take a closer look at all samples with <2500 reads or 1000
+
+```{r}
+prop.df %>%
+  select(Sample_ID, total_reads) %>%
+  unique() %>%
+  filter(total_reads <1000) %>%
+  ggplot(aes(x = reorder(Sample_ID, total_reads), y = total_reads)) +
+  geom_bar(stat = "identity") +
+  #facet_wrap(~`Sample Code`) +
+  theme_bw() +
+  theme(
+    axis.text.x = element_text(angle = 90, hjust = 0.95),
+    legend.position = "bottom"
+  ) +
+  labs(x = "sample replicate",
+       y = "Sequencing reads")
+
+
+```
+
+Can I look at the taxon composition of these?
+
+```{r}
+prop.df %>%
+  #filter(total_reads <2500) %>%
+  ggplot(aes(x = reorder(sample, total_reads), y = total_taxon_ct, fill = taxon)) +
+  geom_bar(stat = "identity") +
+  facet_grid(rows = vars(pcr_rep), labeller = label_both) +
+  theme_bw() +
+  theme(
+    axis.text.x = element_text(angle = 90, hjust = 0.95, size = 6),
+    legend.position = "none"
+  ) +
+  labs(x = "Sample",
+       y = "Sequencing reads",
+       title = "Cook Inlet 2021 sequencing reads per sample, PCR replicates")
+
+#ggsave("pdf_outputs/CookInlet2021_sample_read_depths.pdf", width = 8, height = 4)
+
+```
+What I really don't like here is that the samples for all PCR rep 3 more closely resemble each other. Between that and the high amount of contamination in the negative control, I feel justified tossing those out.
+
+
+## Remove PCR replicate 3
+
+```{r}
+rep.filtered.df <- prop.df %>%
+  filter(pcr_rep != 3) %>%
+   filter(!taxon %in% c("Homo_sapiens", "Micropterus", "Ictalurus", "Sus", "Sus_scrofa", "Bos", "Hominidae") &
+           !str_detect(taxon, "Micropterus"))
+
+rep.filtered.df %>%
+  ggplot(aes(x = reorder(sample, total_reads), y = total_taxon_ct, fill = taxon)) +
+  geom_bar(stat = "identity") +
+  facet_grid(rows = vars(pcr_rep), labeller = label_both) +
+  theme_bw() +
+  theme(
+    axis.text.x = element_text(angle = 90, hjust = 0.95, size = 6),
+    legend.position = "none"
+  ) +
+  labs(x = "Sample",
+       y = "Sequencing reads",
+       title = "Cook Inlet 2021 sequencing reads per sample, PCR replicates")
+```
+
+Now look at field replicates in combination with PCR reps
+
+```{r}
+plot.field.reps2 <- function(sample.code){
+  rep.filtered.df %>%
+  filter(!taxon %in% c("Homo_sapiens", "Micropterus", "Ictalurus", "Sus", "Sus_scrofa", "Bos", "Hominidae") &
+           !str_detect(taxon, "Micropterus")) %>%
+  filter(`Sample Code` == sample.code) %>%
+  ggplot(aes(x = Sample_ID, y = total_taxon_ct, fill = taxon)) +
+  geom_bar(stat = "identity") +
+  facet_wrap(~`Sample Code`) +
+  theme_bw() +
+  theme(
+    axis.text.x = element_text(angle = 90),
+    legend.position = "bottom"
+  ) +
+  labs(x = "Sample replicate",
+       y = "Sequencing reads")
+  
+  
+}
+```
+
+
+```{r}
+lapply(code.list, plot.field.reps2)
+```
+
+
+## Using replicates to determine contaminant taxa
+
+Read in metadata that includes depth per Sample Code (station). This information was lost in Meredith's extraction database and is critical to interpreting the data/replicates.
+```{r}
+depth.data <- readxl::read_xlsx("../metadata/CookInlet_eDNA_metadata2021.xlsx")
+
+depth <- depth.data %>%
+  select(`Extraction ID`, Depth) %>%
+  rename(sample = `Extraction ID`) %>%
+  separate(Depth, into = c("depth", "meters"))
+
+depth$depth <- as.numeric(depth$depth)
+```
+Add depth data
+```{r}
+rep.filtered.w.depth <- rep.filtered.df %>%
+  ungroup() %>%
+  left_join(., depth)
+  
+```
+
+
+```{r}
+rep.filtered.w.depth %>%
+  ungroup() %>%
+  select(`Sample Code`, `Sample Label`, field_rep, depth) %>%
+  unique() %>%
+  group_by(`Sample Code`, `Sample Label`, depth) %>%
+  tally()
+```
+
+Functionally, there are three field replicates per sample code and two PCR replicates for each field replicate (3x2 = 6). 
+
+
+
+## Subtract contaminant reads from controls
+
+Now deal with the controls and subtract reads
+
+```{r}
+rep.control.filtered.df <- rep.filtered.w.depth %>%
+  left_join(., contam.taxa.to.subtract, by = "taxon") %>%
+  mutate(remaining_reads = total_taxon_ct - reads) %>%
+  mutate(remaining_reads = ifelse(remaining_reads < 0, 0, remaining_reads)) %>%
+  mutate(remaining_reads = ifelse(is.na(remaining_reads), total_taxon_ct, remaining_reads)) %>%
+  select(-reads, -total_taxon_ct, -total_reads, -prop_reads) %>%
+  rename(reads = remaining_reads)
+  
+```
+
+
+
+```{r}
+
+plot.field.reps2 <- function(sample.code){
+  rep.control.filtered.df %>%
+  filter(!taxon %in% c("Homo_sapiens", "Micropterus", "Ictalurus", "Sus", "Sus_scrofa", "Bos", "Hominidae") &
+           !str_detect(taxon, "Micropterus")) %>%
+  filter(`Sample Code` == sample.code) %>%
+  ggplot(aes(x = Sample_ID, y = reads, fill = taxon)) +
+  geom_bar(stat = "identity") +
+  facet_grid(cols = vars(depth), scales = "free", labeller = label_both) +
+  theme_bw() +
+  theme(
+    axis.text.x = element_text(angle = 90, hjust = 0.95),
+    axis.title.x = element_text(margin = margin(t=10)),
+    legend.text = element_text(size = 8),
+    legend.key.size = unit(0.3, "cm"),
+    legend.position = "bottom",
+    legend.title = element_blank()
+  ) +
+  labs(x = "Sample replicate",
+       y = "Sequencing reads")
+  
+  #ggsave(paste0("CookInlet2021/",sample.code,"_rep_control_filtered.pdf"), width = 7, height = 6)
+    #ggsave(paste0(sample.code,"_rep_control_filtered.pdf"), width = 7, height = 6)
+
+}
+```
+
+
+```{r}
+lapply(code.list, plot.field.reps2)
+```
+
+Output the dataframe:
+```{r}
+# rep.control.filtered.df %>%
+#   write_csv("CookInletPWSeDNA2021_rep_control_filtered.csv")
+```
+
+
+
+7 June 2022
+
+Meeting with Yumi - 
+
+ammodytidae in cook inlet everywhere, potentially
+
+
+no bleach between bottles; single use filters - reusable filter funnels - move toward this for the future
+
+trawl samples: only one in Prince William Sound
+
+trawl happened after eDNA water sample.
+
+expecting stratfication between surface and bottom - typical of PWS
+
+sampled into the krill clouds - can we detect those
+
+tons of sandlance at the surface. matches up well with data for 212210
+
+trawl net = 36 m2 mouth opening; 32m long; 3 mm cod end liner; 5cm down to 6 mm with the liner
+
+spatial structure in communities - survey is acoustic; trawl to ground truth
+
+shallow you might see larvae everywhere vs. larger fish associated with bottom habitat
+
+current can be 5-7 knots
+
+below 50 meters should be a different water mass
+
+trawl vs. eDNA
+spatial picture - greater diversity in the upper cook inlet region
+upwelling off of the outer bay region - potentially more homogeneous
+North = stratified, turbid, low salinity, warm - shallower though
+
+Juvenile king salmon? commercial interest? somewhat random distribution
+
+
+1) strong spatial segregation
+2) upwelling area vs. stratified
+3) three marine ecoregions: cold, fjord deep, vs. upwelled, vs. warm freshwater
+4) different vertical stratification of biomass and water mass
+can eDNA help groundtruth the acoustics? in places where trawling would be challenging and/or impractical - reduce the amount of trawling.
+
+
+
+In PWS - 
+targeting whale food - fixed transects and CTD stations - that's where the water samples came from
+2021 Global Change Biology - 
+
+
+
+
+
+voucher samples??
+
+Trichodon trichodon - Pacific sandfish?
+
+Bottom trawl (3 year project) in Cook Inlet - 2023.
+Pelagic coupling? Signal all the way to the bottom
+
+Depth is driven by the acoustic signal - which is why it varies.
+
+
+
+*buy benchtop pads for sending 
+Sampling dates = July 11-31 Cook Inlet
+
+
+
+
+### Read in fish catch data
+
+```{r}
+fish.catch <- read_csv("../data/2021fish.catch.csv")
+
+# take a look
+head(fish.catch)
+```
+
+
+
+Summarize the catch per station - just looking at data from Cook Inlet for now.
+
+
+```{r}
+cook.catch <- fish.catch %>%
+  filter(region == "Cook Inlet") %>%
+  group_by(station_number) 
+
+# looks like lots of gaps in the scientific names
+# how to deal with that exactly?
+head(cook.catch)
+```
+
+Some summary basics?
+How many total species, what are the dominant species, etc.
+
+```{r}
+cook.catch %>%
+  arrange(desc(SumOfcount)) %>%
+  select(station_number, common_name, genus_name, species_name, SumOfcount) %>%
+  # how many NAs for sci names?
+  filter(is.na(genus_name))
+
+# for a bar plot, the x variable needs to be categorical
+cook.catch$station_number <- as.character(cook.catch$station_number)
+```
+Okay, actually, not that many and mostly things we don't detect with MiFish.
+Let's ignore those for now.
+
+```{r}
+# just looking at fish
+cook.catch %>%
+  filter(!is.na(genus_name)) %>%
+  select(station_number, common_name, genus_name, species_name, SumOfcount) %>%
+  ggplot(aes(x = station_number, y = SumOfcount, fill = genus_name)) +
+  geom_bar(stat = "identity") +
+  theme_minimal()
+
+```
+
+```{r}
+cook.catch.df <- cook.catch %>%
+   filter(!is.na(genus_name), SumOfcount > 0, common_name != "Squid UNID", species_name != "Pacifica") %>%
+    select(station_number, common_name, genus_name, species_name, SumOfcount)  %>%
+  ungroup() %>%
+  mutate(family = ifelse(str_detect(genus_name, "(family)"), genus_name, NA)) %>%
+  mutate(family = ifelse(genus_name == "Pleuronectidae", "Pleuronectidae", family)) %>%
+    mutate(genus_name = ifelse(!is.na(family), NA, genus_name)) %>%
+      mutate(family = ifelse(genus_name %in% c("Gadus", "Microgadus"), "Gadidae", family)) %>%
+        mutate(family = ifelse(genus_name %in% c("Ammodytes"), "Ammodytidae", family)) %>%
+          mutate(family = ifelse(genus_name %in% c("Spirinchus", "Mallotus"), "Osmeridae", family)) %>%
+            mutate(family = ifelse(genus_name %in% c("Spirinchus", "Mallotus", "Thaleichthys"), "Osmeridae", family)) %>%
+              mutate(family = ifelse(genus_name %in% c("Clupea"), "Clupeidae", family)) %>%
+                mutate(family = ifelse(genus_name %in% c("Hippoglossoides"), "Pleuronectidae", family)) %>%
+                  mutate(family = ifelse(genus_name %in% c("Oncorhynchus"), "Salmonidae", family)) %>%
+                    mutate(family = ifelse(genus_name %in% c("Leptoclinus", "Lumpenus"), "Lumpenidae", family)) %>%
+                      mutate(family = ifelse(genus_name %in% c("Trichodon"), "Trichodontidae", family)) %>%
+                        mutate(family = ifelse(genus_name %in% c("Liparis"), "Liparidae", family)) %>%
+                          mutate(family = ifelse(genus_name %in% c("Zaprora"), "Zaproridae", family)) %>%
+
+
+    unite(3:4, col = "species", sep = "_", remove = F) %>%
+    unique() %>%
+  mutate(species = ifelse(species == "NA_NA", NA, species))
+  
+
+cook.catch.df %>%
+  select(-station_number, -SumOfcount) %>%
+  unique() 
+```
+
+Organize the eDNA data to merge based on species resolution?
+```{r}
+cook.edna <- rep.control.filtered.df %>%
+  filter(`Sample Label` == "Cook Inlet") %>% # now take the mean reads per taxon across the replicates
+  rename(station_number = `Sample Code`) %>%
+  filter(reads > 0) %>%
+  group_by(station_number, taxon, depth) %>%
+  summarise(mean_reads = mean(reads)) 
+
+```
+
+
+```{r}
+cook.edna %>%
+  ungroup() %>%
+  select(taxon) %>%
+  unique() 
+
+```
+
+only 27 unique taxa - which overlap with the trawl?
+
+```{r}
+cook.catch.df %>%
+  select(species, family) %>%
+  unique()
+```
+23 unique taxa.
+
+
+Pat had an interesting suggestion of combining the species_genus_family in a single column and then using grepl to join with the eDNA data...
+
+
+
+```{r}
+catch.w.taxa <- cook.catch.df %>% 
+  unite(3,4,7, col = "taxon", sep = "-")
+
+catch.w.taxa
+```
+
+Here is where Pat helped create a somewhat complex method by which we can search the species/genus/family columns of the trawl catch to see if any of the three match the taxon identified by the eDNA. If there is a match, then the eDNA taxon and read counts are printed to the dataframe.
+```{r}
+#To subset the catch data into a list based on the taxa rows in eDNA
+stationhits<-list()
+
+for (st in (1:length(unique(cook.catch.df$station_number)))){
+  StoInt<-unique(cook.catch.df$station_number)[st]
+  
+  catch.temp<-cook.catch.df%>%
+    filter(station_number==StoInt)
+  edna.temp<-cook.edna %>%
+    filter(station_number==StoInt)
+
+  if(nrow(edna.temp)>=1){
+  
+  stationedna<-lapply(1:nrow(edna.temp),function(i) 
+    if(nrow(catch.temp[c(grep(pattern=edna.temp$taxon[i],catch.temp$species_name),grep(pattern=edna.temp$taxon[i],catch.temp$genus_name),  grep(pattern=edna.temp$taxon[i],catch.temp$family)),]) >= 1){
+    data.frame(catch.temp[c(grep(pattern=edna.temp$taxon[i],catch.temp$species_name),grep(pattern=edna.temp$taxon[i],catch.temp$genus_name),  grep(pattern=edna.temp$taxon[i],catch.temp$family)),],
+                                                                     edna.temp[i,])
+    }else{
+      cat(paste("Didn't find anything for station", StoInt,sep=" "))
+    }
+                            )
+  stationhits[[st]]<-do.call(rbind,stationedna)
+  
+  } else {#if there is a station for edna
+  
+    stationhits[[st]]<- data.frame(catch.temp,
+                                   station_number=NA,
+                                   taxon = NA,
+                                   depth = NA,
+                                   mean_reads = NA)
+  }# if no station for edna fill in with NAs
+  
+} #over stations
+
+restemp<-do.call(rbind,stationhits)
+#now we need to add each row count from eDNA into each list
+
+
+```
+Maybe easiest to look at proportion of catch for the two different data types
+```{r}
+# print that dataframe to take a quick look
+catch.eDNA.merged <- restemp %>% 
+  group_by(station_number) %>%
+  mutate(trawl = SumOfcount/(sum(SumOfcount))) %>%
+  mutate(eDNA = mean_reads/(sum(mean_reads))) %>%
+  pivot_longer(cols = 12:13, names_to = "gear_type", values_to = "prop_of_catch") 
+  
+```
+
+
+```{r}
+catch.eDNA.merged %>%
+  filter(station_number == station_number.1) %>%
+  ggplot() +
+  geom_bar(aes(x = station_number, y = prop_of_catch, fill = species), stat = "identity") +
+  theme_bw() +
+  facet_grid(rows = vars(gear_type)) +
+  labs(
+    y = "Proportion of catch",
+    x = "Station"
+  ) +
+  theme(
+    axis.text.x = element_text(size = 6),
+    axis.title.x = element_text(margin = margin(t = 10)),
+    axis.title.y = element_text(margin = margin(r = 10))
+  )
+
+ggsave("pdf_outputs/catch_comparison_eDNA_trawl.pdf", height = 4, width = 9)  
+```
+
+
+Come up with a figure that compares the trawl to the eDNA catches
+
+```{r}
+restemp %>%
+  filter(station_number == station_number.1) %>%
+  ggplot() +
+  geom_bar(aes(x = station_number, y = SumOfcount, fill = species), stat = "identity") +
+  #geom_bar(aes(x = station_number, y = mean_reads), stat = "identity")
+  theme_minimal()
+
+```
+
+```{r}
+cook.edna %>%
+  ggplot(aes(x = station_number, y = mean_reads, fill = taxon)) +
+  geom_bar(stat = "identity") +
+  theme_minimal()
+  
+```
+
+
+
+
